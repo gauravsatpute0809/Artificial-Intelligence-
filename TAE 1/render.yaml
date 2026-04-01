@@ -1,9 +1,0 @@
-services:
-  - type: web
-    name: engineering-hospital-system
-    runtime: python
-    buildCommand: ./build.sh
-    startCommand: gunicorn --chdir backend app:app
-    envVars:
-      - key: PORT
-        value: 5000

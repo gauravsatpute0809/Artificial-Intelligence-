@@ -1,22 +1,14 @@
-from flask import Flask, request, jsonify, send_from_directory
+from flask import Flask, request, jsonify
 from flask_cors import CORS
 from chatbot_logic import ChatbotLogic
 import os
 import sqlite3
-from models import init_db
 
-# Detect absolute paths for reliability
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-STATIC_DIR = os.path.join(os.path.dirname(BASE_DIR), "frontend", "dist")
-
-app = Flask(__name__, static_folder=STATIC_DIR, static_url_path="/")
+app = Flask(__name__)
 CORS(app) # Allow cross-origin requests
 
 chatbot = ChatbotLogic()
 DB_PATH = os.path.join(os.path.dirname(__file__), "hospital.db")
-
-
-
 
 @app.route('/get_departments', methods=['GET'])
 def departments():
@@ -105,24 +97,5 @@ def chat_entry():
 
     return jsonify({"response": "Error processing chat.", "next_step": "start"}), 400
 
-# STATIC FILES SERVING (CATCH-ALL)
-@app.route("/")
-def serve_frontend():
-    if not os.path.exists(os.path.join(app.static_folder, "index.html")):
-        return "Frontend not built. Please run 'npm run build' in frontend folder.", 404
-    return send_from_directory(app.static_folder, "index.html")
-
-@app.route("/<path:path>")
-def serve_static(path):
-    if path != "" and os.path.exists(os.path.join(app.static_folder, path)):
-        return send_from_directory(app.static_folder, path)
-    if os.path.exists(os.path.join(app.static_folder, "index.html")):
-        return send_from_directory(app.static_folder, "index.html")
-    return "Not Found", 404
-
 if __name__ == "__main__":
-    # Ensure database is initialized
-    init_db()
-    port = int(os.environ.get("PORT", 5000))
-    print(f"🚀 Server running on port {port}")
-    app.run(host="0.0.0.0", port=port, debug=False)
+    app.run(debug=True, port=5000)

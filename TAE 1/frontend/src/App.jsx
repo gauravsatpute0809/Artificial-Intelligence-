@@ -10,7 +10,7 @@ function App() {
   const [treeData, setTreeData] = useState({});
 
   useEffect(() => {
-    fetch('/get_doctors')
+    fetch('http://localhost:5000/get_doctors')
       .then(res => res.json())
       .then(data => setTreeData(data))
       .catch(err => console.error("Error fetching doctors:", err));

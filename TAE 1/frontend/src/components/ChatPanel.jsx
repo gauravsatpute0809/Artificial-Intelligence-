@@ -32,7 +32,7 @@ const ChatPanel = ({ selectedDoctor, setSelectedDoctor }) => {
   const processResponse = async (userInput, currentStep) => {
     setIsTyping(true);
     try {
-      const res = await fetch('/chat', {
+      const res = await fetch('http://localhost:5000/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: userInput, step: currentStep })
@@ -91,11 +91,10 @@ const ChatPanel = ({ selectedDoctor, setSelectedDoctor }) => {
 
   const fetchDoctors = async (dept) => {
     setIsTyping(true);
-    const res = await fetch(`/get_doctors?department=${dept}`);
+    const res = await fetch(`http://localhost:5000/get_doctors?department=${dept}`);
     const data = await res.json();
     setIsTyping(false);
     addMessage(`Great Choice! Here are the specialists in ${dept}. Please select one:`, "bot");
-    // FIX: Store doctor objects (id AND name) to ensure handleDoctorSelection works
     setOptions(data);
     setStep("doctor");
   };
@@ -104,7 +103,7 @@ const ChatPanel = ({ selectedDoctor, setSelectedDoctor }) => {
     addMessage(`Selected Doctor: ${doctor.name}`, "user");
     setPatientData(p => ({ ...p, doctor_id: doctor.id, doctor_name: doctor.name }));
     setIsTyping(true);
-    const res = await fetch(`/check_availability?doctor_id=${doctor.id}`);
+    const res = await fetch(`http://localhost:5000/check_availability?doctor_id=${doctor.id}`);
     const slots = await res.json();
     setIsTyping(false);
     
@@ -127,7 +126,7 @@ const ChatPanel = ({ selectedDoctor, setSelectedDoctor }) => {
   const confirmBooking = async (slot) => {
     setIsTyping(true);
     const finalData = { ...patientData, slot: slot };
-    const res = await fetch('/book_appointment', {
+    const res = await fetch('http://localhost:5000/book_appointment', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(finalData)
