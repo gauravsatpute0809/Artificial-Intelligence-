@@ -1,14 +1,25 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 from chatbot_logic import ChatbotLogic
 import os
 import sqlite3
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder="../frontend/dist", static_url_path="/")
 CORS(app) # Allow cross-origin requests
 
 chatbot = ChatbotLogic()
 DB_PATH = os.path.join(os.path.dirname(__file__), "hospital.db")
+
+@app.route("/")
+def serve_frontend():
+    return send_from_directory(app.static_folder, "index.html")
+
+@app.route("/<path:path>")
+def serve_static(path):
+    if path != "" and os.path.exists(os.path.join(app.static_folder, path)):
+        return send_from_directory(app.static_folder, path)
+    return send_from_directory(app.static_folder, "index.html")
+
 
 @app.route('/get_departments', methods=['GET'])
 def departments():
@@ -98,4 +109,5 @@ def chat_entry():
     return jsonify({"response": "Error processing chat.", "next_step": "start"}), 400
 
 if __name__ == "__main__":
-    app.run(debug=True, port=5000)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port, debug=False)
