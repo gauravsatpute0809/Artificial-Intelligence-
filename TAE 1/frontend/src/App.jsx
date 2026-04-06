@@ -10,7 +10,8 @@ function App() {
   const [treeData, setTreeData] = useState({});
 
   useEffect(() => {
-    fetch('http://localhost:5000/get_doctors')
+    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+    fetch(`${apiUrl}/get_doctors`)
       .then(res => res.json())
       .then(data => setTreeData(data))
       .catch(err => console.error("Error fetching doctors:", err));

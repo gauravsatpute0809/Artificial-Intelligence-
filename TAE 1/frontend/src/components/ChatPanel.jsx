@@ -11,6 +11,8 @@ const ChatPanel = ({ selectedDoctor, setSelectedDoctor }) => {
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef(null);
 
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
@@ -32,7 +34,7 @@ const ChatPanel = ({ selectedDoctor, setSelectedDoctor }) => {
   const processResponse = async (userInput, currentStep) => {
     setIsTyping(true);
     try {
-      const res = await fetch('http://localhost:5000/chat', {
+      const res = await fetch(`${API_URL}/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: userInput, step: currentStep })
@@ -91,7 +93,7 @@ const ChatPanel = ({ selectedDoctor, setSelectedDoctor }) => {
 
   const fetchDoctors = async (dept) => {
     setIsTyping(true);
-    const res = await fetch(`http://localhost:5000/get_doctors?department=${dept}`);
+    const res = await fetch(`${API_URL}/get_doctors?department=${dept}`);
     const data = await res.json();
     setIsTyping(false);
     addMessage(`Great Choice! Here are the specialists in ${dept}. Please select one:`, "bot");
@@ -103,7 +105,7 @@ const ChatPanel = ({ selectedDoctor, setSelectedDoctor }) => {
     addMessage(`Selected Doctor: ${doctor.name}`, "user");
     setPatientData(p => ({ ...p, doctor_id: doctor.id, doctor_name: doctor.name }));
     setIsTyping(true);
-    const res = await fetch(`http://localhost:5000/check_availability?doctor_id=${doctor.id}`);
+    const res = await fetch(`${API_URL}/check_availability?doctor_id=${doctor.id}`);
     const slots = await res.json();
     setIsTyping(false);
     
@@ -126,7 +128,7 @@ const ChatPanel = ({ selectedDoctor, setSelectedDoctor }) => {
   const confirmBooking = async (slot) => {
     setIsTyping(true);
     const finalData = { ...patientData, slot: slot };
-    const res = await fetch('http://localhost:5000/book_appointment', {
+    const res = await fetch(`${API_URL}/book_appointment`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(finalData)
